@@ -6,7 +6,18 @@
 */
 
 function countVowels(str) {
-    // Your code here
+    let copyStr = str.toLowerCase();
+    let vowels = "aeiou";
+
+    let count = 0;
+    for(let each in copyStr){
+      if(vowels.indexOf(copyStr[each]) >= 0) count++;
+    }
+    console.log(count);
+    return count;
 }
+
+countVowels("programming");
+
 
 module.exports = countVowels;
