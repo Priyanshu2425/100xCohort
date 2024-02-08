@@ -14,8 +14,50 @@
  */
 const express = require('express');
 const fs = require('fs');
+const bodyparser = require("body-parser")
 const path = require('path');
+
 const app = express();
 
+app.use(bodyparser.json());
+
+app.get('/files', (req, res)=>{
+  try {
+    fs.readdir(path.join(__dirname, "./files/"), (err, data)=>{
+      if(err) {
+        res.status(500).json({error: "failed"});
+        console.log("hello");
+      }
+    else res.status(200).json(data);
+    });
+  } catch (error) {
+    res.status(500).json({error: "failed"});
+  }
+
+  // fs.readdir(path.join(__dirname, './files/'), (err, files) => {
+  //   if (err) {
+  //       return res.status(500).json({ error: 'Failed to retrieve files' });
+  //   }
+  //   res.json(files);
+  //   });
+  
+})
+
+app.get('/file/:filename', (req, res)=>{
+  let filename = req.params.filename;
+  fs.readFile(path.join(__dirname, "./files/", filename), "utf-8", (err, data)=>{
+    if(err){
+      res.status(404).send("File not found");
+    }else{
+      res.status(200).send(data);
+    }
+  })
+})
+
+app.get("*", (req, res)=>{
+  res.status(404).send("Route not found");
+})
+
+app.listen(3001);
 
 module.exports = app;

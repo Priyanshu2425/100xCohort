@@ -6,17 +6,102 @@
     let globalId = 1;
     let todoState = [];
     let oldTodoState = [];
+    
+    // let oldInputs = [];
+    function enableInputs(event){
+      const targetTodoInputs = event.target.parentNode.children;
+      const actionToTake = event.target.textContent;
 
-    function addTodoToDom() {
-      
+      if(actionToTake === "Cancel"){
+        // targetTodoInputs[1].value = oldInputs[0];
+        // targetTodoInputs[2].value = oldInputs[1];
+        // oldInputs = [];
+
+        targetTodoInputs[1].setAttribute("disabled", "disabled");
+        targetTodoInputs[2].setAttribute("disabled", "disabled");
+        event.target.textContent = "Edit";
+        return;
+      }
+
+      // oldInputs.push(targetTodoInputs[1].value);
+      // oldInputs.push(targetTodoInputs[2].value);
+
+      targetTodoInputs[1].removeAttribute("disabled");
+      targetTodoInputs[2].removeAttribute("disabled");
+      event.target.textContent = "Cancel";
+
+    }
+
+    function addTodoToDom(added) {
+      const todosDiv = document.getElementById("todos");
+      added.forEach((item)=>{
+        const todoElement = document.createElement("div");
+
+        const count = document.createElement("span");
+        const title = document.createElement("input");
+        const desc = document.createElement("input");
+        const _delete = document.createElement("button");
+        const edit = document.createElement("button");
+        const update = document.createElement("button");
+
+        count.innerText = item.id; 
+        title.value = item.title;
+        desc.value = item.description;
+        _delete.textContent = "Delete";
+        edit.textContent  = "Edit";
+        update.textContent = "Update";
+
+        update.onclick = updateTodo;
+        edit.onclick = enableInputs;
+        _delete.onclick = removeTodo;
+        title.setAttribute("disabled", "disabled");
+        desc.setAttribute("disabled", "disabled");
+
+        todoElement.appendChild(count);
+        todoElement.appendChild(title);
+        todoElement.appendChild(desc);
+        todoElement.appendChild(_delete);
+        todoElement.appendChild(edit);
+        todoElement.appendChild(update);
+
+        todosDiv.appendChild(todoElement);
+      })
+        
     }
 
     function removeTodoFromDom(todo) {
-      
+      const todosDiv = document.getElementById("todos");
+      const current = [];
+      const todosDivChildren = todosDiv.children;
+      console.log(todosDivChildren[0]);
+      for(let i = 0; i < todosDivChildren.length; i++){
+        let remove = todo.find((toDelete)=>{
+          return toDelete.id === parseInt(todosDivChildren[i].children[0].innerText);
+        });
+        if(remove)
+          todosDiv.removeChild(todosDivChildren[i]);
+      }
+
     }
 
-    function updateTodoInDom(oldTodo, newTodo) {
+    function updateTodoInDom(updated) {
+      const todosDiv = document.getElementById("todos");
+      const todosDivChildren = todosDiv.children;
+
+      console.log(todosDivChildren);
+      for(let i = 0; i < todosDivChildren.length; i++){
+        updated.forEach((updated)=>{
+          if(todosDivChildren[i].children[0].innerText === updated.id){
+            todosDivChildren[i].children[1] = updated.title;
+            todosDivChildren[i].children[2] = updated.description;
+
+            todosDivChildren[i].children[1].setAttributeNode("disabled", "disabled");
+            todosDivChildren[i].children[2].setAttributeNode("disabled", "disabled");
+          }
+        })
         
+      }
+      console.log("done");
     }
 
     function updateState(newTodos) {
@@ -25,13 +110,55 @@
       // 1. added
       // 2. deleted
       // 3. updated
+      
       const added = [];
       const deleted = [];
       const updated = [];
+
+      if(todoState.length != 0 && todoState.length === oldTodoState.length){
+        console.log(todoState, oldTodoState);
+        todoState.forEach((task)=>{
+          let taskFound = oldTodoState.find((oldtask)=>{
+              return task.id === oldtask.id && (task.title != oldtask.title || task.description != oldtask.description);
+          })
+
+          if(taskFound)  updated.push(taskFound);
+        })
+
+        if(updated.length != 0)
+          updateTodoInDom(updated);
+        return;
+      }
+
+      todoState.forEach((task)=>{
+
+        let taskFound = oldTodoState.find((oldtask)=>{
+          return task.id === oldtask.id
+        })
+
+        if(!taskFound) added.push(task);
+      });
+
+      console.log("Added: " + added, added.length);
+      if(added.length === 0) {
+        console.log(todoState, oldTodoState);
+        oldTodoState.forEach((oldTask)=>{
+          let taskFound = todoState.find((task)=>{
+            return oldTask.id === task.id;
+          })
+          
+          if(!taskFound) deleted.push(oldTask);
+        })
+        removeTodoFromDom(deleted);
+        return;
+      }
+      
+      addTodoToDom(added);
+      
       // calculate these 3 arrays
       // call addTodo, removeTodo, updateTodo functions on each of the
       // elements
-      oldTodoState = newTodos;
+      // oldTodoState = newTodos;
     }
 
     function addTodo() {
@@ -42,8 +169,52 @@
         description: description,
         id: globalId++,
       })
+
       updateState(todoState);
+      oldTodoState = [];
+      todoState.forEach((task)=>{
+        let newObj = {...task};
+        oldTodoState.push(newObj);
+      })
     }
+
+    function removeTodo(event){
+      const title = document.getElementById("title").value;
+      const description = document.getElementById("description").value;
+
+      const toRemove = parseInt(event.target.parentNode.children[0].innerText);
+
+      todoState = todoState.filter((task)=>{
+        return task.id != toRemove;
+      })
+      updateState(todoState);
+
+      oldTodoState = [];
+      todoState.forEach((task)=>{
+        let newObj = {...task};
+        oldTodoState.push(newObj);
+      })
+    }
+    
+    function updateTodo(event){
+      const title = event.target.parentNode.children[1].value;
+      const description = event.target.parentNode.children[2].value;
+
+      todoState.forEach((task)=>{
+        if(task.id === parseInt(event.target.parentNode.children[0].innerText)) {
+          task.title = title;
+          task.description = description;
+        }
+      })
+      updateState(todoState);
+      oldTodoState = [];
+      todoState.forEach((task)=>{
+        let newObj = {...task};
+        oldTodoState.push(newObj);
+      })
+      console.log(todoState, oldTodoState);
+    }
+    
   </script>
 </head>
 

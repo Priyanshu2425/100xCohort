@@ -29,7 +29,7 @@
     Response: 200 OK if the todo item was found and updated, or 404 Not Found if not found.
     Example: PUT http://localhost:3000/todos/123
     Request Body: { "title": "Buy groceries", "completed": true }
-    
+
   5. DELETE /todos/:id - Delete a todo item by ID
     Description: Deletes a todo item identified by its ID.
     Response: 200 OK if the todo item was found and deleted, or 404 Not Found if not found.
@@ -40,10 +40,94 @@
   Testing the server - run `npm run test-todoServer` command in terminal
  */
   const express = require('express');
+  const fs = require('fs');
   const bodyParser = require('body-parser');
-  
   const app = express();
   
+  // fs.readFile("./week-2/02-nodejs/todos.json", "utf-8", (err, data)=>{
+  //   let todos = JSON.parse(data);
+  //   console.log(todos);
+  //   todos.push({"item4": "not done"});
+  //   console.log(todos);
+  //   fs.writeFile("./week-2/02-nodejs/todos.json", JSON.stringify(todos), (err)=>{
+  //     if(err) console.log(err);
+  //     else{
+  //       console.log("written successfully");
+  //       fs.readFile("./week-2/02-nodejs/todos.json", "utf-8", (err, data)=>{
+  //         console.log(JSON.parse(data));
+  //       })
+  //     }
+      
+  //   });
+    
+  // })
+  
   app.use(bodyParser.json());
+  let todos = null; 
+  const path = require('path');
+
+  let PATH_TODOS = "./todos.json";
+  function readTodos(req, res, next){
+    fs.readFile(path.join(__dirname, PATH_TODOS), "utf-8", (err, data)=>{
+      if(err) todos = {"error": err};
+      else todos = JSON.parse(data);
+      next();
+    })
+  }
+
+  app.get('/todos', readTodos, (req, res)=>{
+      if(todos.error) res.send("Error reading file");
+      else{
+        res.status(200).json(todos);
+      }
+  })
+
+  app.get('/todos/:id', readTodos, (req, res)=>{
+    let list = todos;
+    if(req.params.id > 0 && list.length == 0){
+      res.status(404).json({"response": "list empty"})
+    }else if (req.params.id >= list.length){
+      res.status(404).json({"response": "invalid request"})
+    }else{
+      res.status(200).json({"response": list[req.params.id]})
+    }
+  })
+
+  app.post('/todos', readTodos, (req, res)=>{
+    console.log(req.body);
+    let list = todos;
+    list.push(req.body);
+    console.log(req.body.newitem)
+    fs.writeFile(path.join(__dirname, PATH_TODOS), JSON.stringify(list), (err)=>{
+      if(err) res.status(404).json({"error": err});
+      res.status(201).json({"success": 200});
+    });
+  })
+
+  app.put('/todos/:id', readTodos, (req, res)=>{
+    let list = todos;
+    if(req.params.id >= list.length || req.params.id < 0){
+      res.status(404).send({"error": "not found"});
+    }
+    list[req.params.id] = req.body.newitem;
+    fs.writeFile(path.join(__dirname, PATH_TODOS), JSON.stringify(list), (err)=>{
+      res.status(200).send({"success": "updated item"});
+    })
+  })
+
+  app.delete('/todos/:id', readTodos, (req, res)=>{
+    let list = todos;
+    if(req.params.id >= list.length || req.params.id < 0){
+      res.status(404).send({"error": "not found"});
+    }
+    list.splice(req.params.id, 1);
+    fs.writeFile(path.join(__dirname, PATH_TODOS), JSON.stringify(list), (err)=>{
+      res.status(200).send({"success": "deleted at "+req.params.id});
+    })
+  })
+
+  app.listen(3000, ()=>{
+    console.log("Server started successfully");
+  });
   
   module.exports = app;

@@ -3,8 +3,8 @@ const router = Router();
 const userMiddleware = require("../middleware/user");
 
 // User Routes
-router.post('/signup', (req, res) => {
-    // Implement user signup logic
+router.post('/signup', userMiddleware, (req, res) => {
+    
 });
 
 router.get('/courses', (req, res) => {

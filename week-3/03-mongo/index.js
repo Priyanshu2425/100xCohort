@@ -9,6 +9,10 @@ app.use(bodyParser.json());
 app.use("/admin", adminRouter)
 app.use("/user", userRouter)
 
+
+app.use((err, req, res, next)=>{
+    if(err) res.status(404).send("Some internal server error: " + err);
+})
 const PORT = 3000;
 
 app.listen(PORT, () => {

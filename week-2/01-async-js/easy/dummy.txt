@@ -1,0 +1,1 @@
+This is the data that is to be written to the dummy.txt file
