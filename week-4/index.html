@@ -16,6 +16,12 @@
         // targetTodoInputs[1].value = oldInputs[0];
         // targetTodoInputs[2].value = oldInputs[1];
         // oldInputs = [];
+        oldTodoState.forEach((oldTask)=>{
+          if(parseInt(event.target.parentNode.children[0].innerText) === oldTask.id){
+            targetTodoInputs[1].value = oldTask.title;
+            targetTodoInputs[2].value = oldTask.description;
+          }
+        })
 
         targetTodoInputs[1].setAttribute("disabled", "disabled");
         targetTodoInputs[2].setAttribute("disabled", "disabled");
@@ -91,17 +97,17 @@
       console.log(todosDivChildren);
       for(let i = 0; i < todosDivChildren.length; i++){
         updated.forEach((updated)=>{
-          if(todosDivChildren[i].children[0].innerText === updated.id){
+          if(parseInt(todosDivChildren[i].children[0].innerText) === updated.id){
             todosDivChildren[i].children[1] = updated.title;
             todosDivChildren[i].children[2] = updated.description;
 
-            todosDivChildren[i].children[1].setAttributeNode("disabled", "disabled");
-            todosDivChildren[i].children[2].setAttributeNode("disabled", "disabled");
+            console.log("Children: " + todosDivChildren[i].children);
+            todosDivChildren[i].children[1].setAttribute("disabled", "disabled");
+            todosDivChildren[i].children[2].setAttribute("disabled", "disabled");
           }
         })
         
       }
-      console.log("done");
     }
 
     function updateState(newTodos) {
@@ -197,6 +203,9 @@
     }
     
     function updateTodo(event){
+      const editBtn = event.target.parentNode.children[4];
+      editBtn.textContent = "Edit";
+      
       const title = event.target.parentNode.children[1].value;
       const description = event.target.parentNode.children[2].value;
 
@@ -212,7 +221,6 @@
         let newObj = {...task};
         oldTodoState.push(newObj);
       })
-      console.log(todoState, oldTodoState);
     }
     
   </script>
