@@ -17,4 +17,4 @@ export function Assignment2() {
             <button onClick={handleReRender}>Force Re-render</button>
         </div>
     );
-};
+}

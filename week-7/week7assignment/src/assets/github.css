@@ -1,0 +1,45 @@
+#card{
+    width: 280px;
+    height: 500px;
+    height: 500px;
+    border: 1px solid black;
+
+    margin: 10vh auto;
+    padding: 1%;
+
+    font-size: 1rem;
+    background: linear-gradient(#7f7fd5,#86a8e7,#91eae4);
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+#card img{
+    width: 100px;
+    height: 100px;
+    margin-bottom: 20px;
+    border: 5px solid white;
+}
+
+#stats{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content:space-around;
+    gap: 5px;
+
+    color: white;
+    background-color: black;
+    border-radius: 10px;
+    padding: 5px;
+
+    margin-bottom: 20px;
+}
+
+#username{
+    font-size: 0.8rem;
+    margin-bottom: 20px;
+}
+
+#bio{
+    width: 100%;
+    text-align: justify;
+    margin-top: 20px;
+}
