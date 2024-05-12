@@ -6,9 +6,9 @@ export default function QuestionFive(){
 
     const [userObject, setUserObject] = useState("");
 
-    const octokit = new Octokit({
-            auth: 'key'
-            })
+    // const octokit = new Octokit({
+    //         auth: 'key'
+    //         })
 
     async function getUser(){
         
